@@ -70,4 +70,35 @@ describe('AccountService Unit Tests', () => {
     expect(updatedAcc1.solde).toBe(100);
     expect(updatedAcc2.solde).toBe(150);
   });
+
+  it('should throw error when creating account without name', async () => {
+    await expect(accountService.createAccount({})).rejects.toThrow("Le nom du compte est obligatoire.");
+  });
+
+  it('should throw error when getting account with null id', async () => {
+    await expect(accountService.getAccountById(null)).rejects.toThrow("L'identifiant du compte est obligatoire.");
+  });
+
+  it('should throw error when depositing with invalid account id or amount', async () => {
+    await expect(accountService.deposit({ amount: 50 })).rejects.toThrow("L'identifiant du compte est obligatoire.");
+    const acc = await accountService.createAccount({ name: 'Bob', soldeInitial: 100 });
+    await expect(accountService.deposit({ accountId: acc.id, amount: -10 })).rejects.toThrow("Le montant du dépôt doit être supérieur à zéro.");
+  });
+
+  it('should throw error when withdrawing with invalid account id or amount', async () => {
+    await expect(accountService.withdraw({ amount: 50 })).rejects.toThrow("L'identifiant du compte est obligatoire.");
+    const acc = await accountService.createAccount({ name: 'Bob', soldeInitial: 100 });
+    await expect(accountService.withdraw({ accountId: acc.id, amount: -10 })).rejects.toThrow("Le montant du retrait doit être supérieur à zéro.");
+  });
+
+  it('should throw error when transferring with invalid fields', async () => {
+    await expect(accountService.transfer({ destinationAccountId: 2, amount: 50 })).rejects.toThrow("Le compte source est obligatoire.");
+    await expect(accountService.transfer({ sourceAccountId: 1, amount: 50 })).rejects.toThrow("Le compte destination est obligatoire.");
+    await expect(accountService.transfer({ sourceAccountId: 1, destinationAccountId: 2, amount: -50 })).rejects.toThrow("Le montant du virement doit être supérieur à zéro.");
+    await expect(accountService.transfer({ sourceAccountId: 1, destinationAccountId: 1, amount: 50 })).rejects.toThrow("Les comptes source et destination doivent être différents.");
+    
+    const acc1 = await accountService.createAccount({ name: 'A', soldeInitial: 10 });
+    const acc2 = await accountService.createAccount({ name: 'B', soldeInitial: 10 });
+    await expect(accountService.transfer({ sourceAccountId: acc1.id, destinationAccountId: acc2.id, amount: 50 })).rejects.toThrow("Solde insuffisant pour effectuer le virement.");
+  });
 });

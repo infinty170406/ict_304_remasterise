@@ -37,4 +37,20 @@ describe('TransactionService Unit Tests', () => {
     expect(historyAlice[1].destinationAccountId).toBe(acc1.id);
     expect(historyAlice[1].description).toBe('Paycheck');
   });
+
+  it('should retrieve all history successfully', async () => {
+    const acc = await accountService.createAccount({ name: 'Charlie', soldeInitial: 100 });
+    await accountService.withdraw({ accountId: acc.id, amount: 20, description: 'Snacks' });
+
+    const allHistory = await transactionService.getAllHistory();
+    // At least one transaction should be there
+    expect(allHistory.length).toBeGreaterThanOrEqual(1);
+    
+    const withdrawal = allHistory.find(t => t.description === 'Snacks');
+    expect(withdrawal).toBeDefined();
+    expect(withdrawal.type).toBe('WITHDRAWAL');
+    expect(withdrawal.amount).toBe(20);
+    expect(withdrawal.sourceAccountId).toBe(acc.id);
+    expect(withdrawal.destinationAccountId).toBeNull();
+  });
 });
