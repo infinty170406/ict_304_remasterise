@@ -126,7 +126,7 @@ function App() {
               />
             )}
             {currentView === 'transactions' && <TransactionsPage transactions={filteredTransactions} userRole={userRole} />}
-            {currentView === 'cards' && <CardsPage accounts={filteredAccounts} userName={userName || userEmail} userRole={userRole} />}
+            {currentView === 'cards' && <CardsPage accounts={filteredAccounts} userName={userName || userEmail} userRole={userRole} userId={userId} refreshAccounts={fetchAllData} />}
             {currentView === 'analytics' && <AnalyticsPage accounts={filteredAccounts} transactions={filteredTransactions} userRole={userRole} />}
             {currentView === 'settings' && <SettingsPage userId={userId} userName={userName} setUserName={setUserName} userEmail={userEmail} userRole={userRole} />}
           </>

@@ -1,6 +1,10 @@
 import { CreditCard, Plus, Shield } from 'lucide-react';
+import { useState } from 'react';
+import CreateAccountModal from './CreateAccountModal';
 
-const CardsPage = ({ accounts = [], userName, userRole }) => {
+const CardsPage = ({ accounts = [], userName, userRole, userId, refreshAccounts }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   return (
     <div>
       <header className="account-summary-header flex justify-between items-end mb-10">
@@ -13,7 +17,12 @@ const CardsPage = ({ accounts = [], userName, userRole }) => {
           </p>
         </div>
         {userRole !== 'admin' && (
-          <button className="btn btn-primary flex items-center gap-2"><Plus size={16} /> Nouvelle carte</button>
+          <button 
+            className="btn btn-primary flex items-center gap-2"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Plus size={16} /> Nouvelle carte
+          </button>
         )}
       </header>
       
@@ -59,6 +68,15 @@ const CardsPage = ({ accounts = [], userName, userRole }) => {
           ))
         )}
       </div>
+      
+      {isModalOpen && (
+        <CreateAccountModal 
+          userId={userId} 
+          userName={userName} 
+          onClose={() => setIsModalOpen(false)} 
+          refreshAccounts={refreshAccounts} 
+        />
+      )}
     </div>
   );
 };

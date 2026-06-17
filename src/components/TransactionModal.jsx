@@ -5,7 +5,12 @@ import { X } from 'lucide-react';
 const TransactionModal = ({ type, account, accounts, onClose, refreshAccounts }) => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
+  
+  // Nouveaux états pour le virement
+  const [destinationMode, setDestinationMode] = useState('select'); // 'select' ou 'create'
   const [destinationId, setDestinationId] = useState('');
+  const [newBeneficiaryName, setNewBeneficiaryName] = useState('');
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -28,10 +33,25 @@ const TransactionModal = ({ type, account, accounts, onClose, refreshAccounts })
       } else if (type === 'withdraw') {
         await api.withdraw({ accountId: account.id, amount: parsedAmount, description });
       } else if (type === 'transfer') {
-        if (!destinationId) throw new Error('Veuillez sélectionner un compte de destination');
+        let targetId = destinationId;
+        
+        if (destinationMode === 'create') {
+          if (!newBeneficiaryName.trim()) throw new Error('Veuillez saisir le nom du bénéficiaire');
+          // 1. Créer le compte silencieusement
+          const newAccount = await api.createAccount({
+            name: newBeneficiaryName.trim(),
+            currency: account.currency,
+            soldeInitial: 0
+          });
+          targetId = newAccount.id;
+        } else {
+          if (!targetId) throw new Error('Veuillez sélectionner un compte de destination');
+        }
+
+        // 2. Effectuer le virement
         await api.transfer({ 
           sourceAccountId: account.id, 
-          destinationAccountId: parseInt(destinationId), 
+          destinationAccountId: parseInt(targetId), 
           amount: parsedAmount, 
           description 
         });
@@ -65,21 +85,50 @@ const TransactionModal = ({ type, account, accounts, onClose, refreshAccounts })
         
         <form onSubmit={handleSubmit}>
           {type === 'transfer' && (
-            <div className="form-group">
-              <label className="form-label">Compte de destination</label>
-              <select 
-                className="form-select" 
-                value={destinationId} 
-                onChange={e => setDestinationId(e.target.value)}
-                required
-              >
-                <option value="">Sélectionnez un compte...</option>
-                {availableDestinations.map(dest => (
-                  <option key={dest.id} value={dest.id}>
-                    {dest.name} — {dest.soldeInitial.toLocaleString()} {dest.currency}
-                  </option>
-                ))}
-              </select>
+            <div className="form-group mb-6">
+              <label className="form-label">Destinataire</label>
+              
+              <div className="flex bg-surface-container-low rounded-lg p-1 mb-4">
+                <button 
+                  type="button" 
+                  className={`flex-1 py-2 text-sm rounded-md transition-all ${destinationMode === 'select' ? 'bg-surface-container-highest font-bold' : 'text-muted hover:text-white'}`}
+                  onClick={() => setDestinationMode('select')}
+                >
+                  Mes Comptes
+                </button>
+                <button 
+                  type="button" 
+                  className={`flex-1 py-2 text-sm rounded-md transition-all ${destinationMode === 'create' ? 'bg-surface-container-highest font-bold' : 'text-muted hover:text-white'}`}
+                  onClick={() => setDestinationMode('create')}
+                >
+                  Nouveau Bénéficiaire
+                </button>
+              </div>
+
+              {destinationMode === 'select' ? (
+                <select 
+                  className="form-select" 
+                  value={destinationId} 
+                  onChange={e => setDestinationId(e.target.value)}
+                  required={destinationMode === 'select'}
+                >
+                  <option value="">Sélectionnez un compte...</option>
+                  {availableDestinations.map(dest => (
+                    <option key={dest.id} value={dest.id}>
+                      {dest.name} — {dest.soldeInitial.toLocaleString()} {dest.currency}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={newBeneficiaryName} 
+                  onChange={e => setNewBeneficiaryName(e.target.value)} 
+                  placeholder="Nom complet du bénéficiaire"
+                  required={destinationMode === 'create'}
+                />
+              )}
             </div>
           )}
         
