@@ -13,18 +13,8 @@ const TestsPage = ({ userRole }) => {
   const coverageUrl = `${backendBase}/coverage/index.html`;
 
   return (
-    <div className="flex flex-col h-full">
-      <header className="mb-6">
-        <h2 className="text-3xl font-bold mb-2 flex items-center gap-3">
-          <ShieldCheck className="text-success" size={32} />
-          Rapport de Tests (Coverage)
-        </h2>
-        <p className="text-muted">
-          Supervisez l'état de la couverture des tests du backend hébergé.
-        </p>
-      </header>
-
-      <div className="flex-1 bg-surface-container-low rounded-xl overflow-hidden border border-[rgba(255,255,255,0.1)] relative">
+    <div className="flex flex-col" style={{ height: 'calc(100vh - 100px)' }}>
+      <div className="flex-1 bg-surface-container-low rounded-xl overflow-hidden border border-[rgba(255,255,255,0.1)] relative mt-2 shadow-2xl">
         <iframe 
           src={coverageUrl}
           title="Rapport de Coverage Vitest"
