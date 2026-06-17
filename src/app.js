@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import * as accountController from './controllers/accountController.js';
 import * as transactionController from './controllers/transactionController.js';
 import * as authController from './controllers/authController.js';
@@ -8,6 +9,9 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Exposer statiquement le rapport de couverture Vitest pour le dashboard Admin
+app.use('/coverage', express.static(path.join(process.cwd(), 'coverage')));
 
 // Auth routes
 app.post('/api/auth/register', authController.register);
