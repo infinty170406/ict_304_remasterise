@@ -1,4 +1,4 @@
-import { LayoutDashboard, Receipt, CreditCard, BarChart2, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { LayoutDashboard, Receipt, CreditCard, BarChart2, Settings, HelpCircle, LogOut, ShieldCheck } from 'lucide-react';
 const Sidebar = ({ onLogout, userRole, currentView, onNavigate }) => {
   return (
     <aside className="sidebar">
@@ -28,6 +28,12 @@ const Sidebar = ({ onLogout, userRole, currentView, onNavigate }) => {
           <Settings size={18} />
           <span>{userRole === 'admin' ? 'Configuration' : 'Paramètres'}</span>
         </a>
+        {userRole === 'admin' && (
+          <a href="#" className={`nav-item ${currentView === 'tests' ? 'active' : ''}`} onClick={e => { e.preventDefault(); onNavigate('tests'); }}>
+            <ShieldCheck size={18} />
+            <span>Console Tests</span>
+          </a>
+        )}
       </nav>
 
       <div className="sidebar-footer">

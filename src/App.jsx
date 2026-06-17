@@ -9,6 +9,7 @@ import TransactionsPage from './components/TransactionsPage';
 import CardsPage from './components/CardsPage';
 import AnalyticsPage from './components/AnalyticsPage';
 import SettingsPage from './components/SettingsPage';
+import TestsPage from './components/TestsPage';
 import { Bell } from 'lucide-react';
 import './index.css';
 
@@ -129,6 +130,7 @@ function App() {
             {currentView === 'cards' && <CardsPage accounts={filteredAccounts} userName={userName || userEmail} userRole={userRole} userId={userId} refreshAccounts={fetchAllData} />}
             {currentView === 'analytics' && <AnalyticsPage accounts={filteredAccounts} transactions={filteredTransactions} userRole={userRole} />}
             {currentView === 'settings' && <SettingsPage userId={userId} userName={userName} setUserName={setUserName} userEmail={userEmail} userRole={userRole} />}
+            {currentView === 'tests' && userRole === 'admin' && <TestsPage userRole={userRole} />}
           </>
         )}
       </main>
